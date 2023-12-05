@@ -14,11 +14,11 @@ export const ContactList = () => {
   // });
 
 const removeContact = (event, _id) => {
-  event.preventDefault();
+  event.preventDefault(); // Hace que no se devuelva al inicio cuando elimine un contacto.
   Meteor.call('contacts.remove', { contactId: _id });
 }
 
-if(isLoading()) {
+if(isLoading()) { // Mientras no termina de cargar todos los contactos.
   return (
   <div>
     <div className="mt-10">
@@ -30,7 +30,7 @@ if(isLoading()) {
   )
 }
 
-const ContactItem = memo(({ contact }) => {
+const ContactItem = memo(({ contact }) => { // memo se encarga de optimizar el número de renderizaciones.
   return (
     <li className="py-4 flex items-center justify-between space-x-3">
               <div className="min-w-0 flex-1 flex items-center space-x-3">
