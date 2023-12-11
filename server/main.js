@@ -6,14 +6,7 @@ import '../imports/api/collections/WalletsCollection';
 import '../imports/api/collections/TransactionsCollection';
 import '../imports/api/methods/TransactionsMethods';
 import '../imports/api/publications/WalletsPublications';
-import { WalletsCollection } from '../imports/api/collections/WalletsCollection';
 import '../infra/CustomError';
-
-Meteor.startup(() => {
-  if (!WalletsCollection.find().count()) {
-    WalletsCollection.insert({ 
-      createdAt: new Date(),
-      currency: 'USD',
-    });
-  }
-});
+import '../infra/accounts';
+import '../infra/roles';
+import '../imports/api/methods/RolesMethods';

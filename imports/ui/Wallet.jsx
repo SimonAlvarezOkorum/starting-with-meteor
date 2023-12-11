@@ -6,10 +6,13 @@ import { SelectContact } from "./components/SelectContact";
 import { ContactsCollection } from "../api/collections/ContactsCollection";
 import { WalletsCollection } from "../api/collections/WalletsCollection";
 import { Loading } from "./components/Loading";
+import { useLoggedUser } from 'meteor/quave:logged-user-react';
 
 export const Wallet = () => {
-  const isLoadingContacts = useSubscribe("contacts");
-  const isLoadingWallets = useSubscribe("wallets");
+
+  const { loggedUser } = useLoggedUser();
+  const isLoadingContacts = useSubscribe("myContacts");
+  const isLoadingWallets = useSubscribe("myWallet");
   const contacts = useFind(() =>
     ContactsCollection.find(
       { archived: { $ne: true } },
@@ -20,7 +23,7 @@ export const Wallet = () => {
   const [open, setOpen] = React.useState(false);
   const [isTransferring, setIsTransferring] = React.useState(false);
   const [amount, setAmount] = React.useState(0);
-  const [destinationWallet, setDestinationWallet] = React.useState({});
+  const [destinationContact, setdestinationContact] = React.useState({});
   const [errorMessage, setErrorMessage] = React.useState("");
 
   const addTransaction = () => {
@@ -28,8 +31,8 @@ export const Wallet = () => {
       "transactions.insert",
       {
         isTransferring,
-        sourceWalletId: wallet._id,
-        destinationWalletId: destinationWallet?.walletId || "",
+        sourceWalletId: wallet?._id,
+        destinationContactId: destinationContact?._id || "",
         amount: Number(amount),
       },
       (errorResponse) => {
@@ -43,7 +46,7 @@ export const Wallet = () => {
           }
         } else {
           setOpen(false);
-          setDestinationWallet({});
+          setdestinationContact({});
           setAmount(0);
           setErrorMessage("");
         }
@@ -57,28 +60,31 @@ export const Wallet = () => {
 
   return (
     <>
-      <div className="flex font-sans shadow-md my-10">
+      <div className="my-10 flex font-sans shadow-md">
         <form className="flex-auto p-6">
           <div className="flex flex-wrap">
-            <div className="w-full flex-none text-sm font-medium text-gray-500">
-              Main account
+            <div className="mt-2 w-full flex-none text-sm font-medium text-gray-500">
+              Email:
             </div>
-            <div className="w-full flex-none text-sm font-medium text-gray-500 mt-2">
+            <h1 className="flex-auto text-lg font-semibold text-gray-700">
+              {loggedUser?.email}
+            </h1>
+            <div className="mt-2 w-full flex-none text-sm font-medium text-gray-500">
               Wallet ID:
             </div>
             <h1 className="flex-auto text-lg font-semibold text-gray-700">
-              {wallet._id}
+              {wallet?._id}
             </h1>
             <div className="text-2xl font-bold text-gray-700">{`${wallet.balance} ${wallet.currency}`}</div>
           </div>
           <div className="flex space-x-4 text-sm font-medium">
-            <div className="flex-auto flex space-x-4 mt-4">
+            <div className="mt-4 flex flex-auto space-x-4">
               <button
                 type="button"
-                className="bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600"
+                className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
                 onClick={() => {
                   setIsTransferring(false);
-                  setErrorMessage("");
+                  setErrorMessage('');
                   setOpen(true);
                 }}
               >
@@ -115,8 +121,8 @@ export const Wallet = () => {
                 <SelectContact
                   title="Destination contact"
                   contacts={contacts}
-                  contact={destinationWallet}
-                  setContact={setDestinationWallet}
+                  contact={destinationContact}
+                  setContact={setdestinationContact}
                 />
               </div>
             )}
